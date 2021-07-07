@@ -6,95 +6,74 @@
  * Time: 4:19 下午.
  */
 
-namespace HughCube\Laravel\Package;
+namespace HughCube\Laravel\OssUtil;
 
-use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class Manager
 {
     /**
-     * The alifc server configurations.
-     *
-     * @var array
+     * @var string
      */
-    protected $config;
+    protected $bin;
 
     /**
-     * The clients.
-     *
-     * @var Store[]
+     * @param string $bin
+     * @return $this
      */
-    protected $stores = [];
-
-    /**
-     * Manager constructor.
-     *
-     * @param array $config
-     */
-    public function __construct(array $config)
+    public function setBin($bin)
     {
-        $this->config = $config;
+        $this->bin = $bin;
+
+        return $this;
     }
 
     /**
-     * Get a store by name.
-     *
-     * @param string|null $name
-     *
-     * @return Store
-     */
-    public function store($name = null)
-    {
-        $name = null == $name ? $this->getDefaultClient() : $name;
-
-        if (isset($this->stores[$name])) {
-            return $this->stores[$name];
-        }
-
-        return $this->stores[$name] = $this->resolve($name);
-    }
-
-    /**
-     * Resolve the given store by name.
-     *
-     * @param string|null $name
-     *
-     * @return Store
-     */
-    protected function resolve($name = null)
-    {
-        return new Store();
-    }
-
-    /**
-     * Get the default store name.
-     *
      * @return string
      */
-    public function getDefaultClient()
+    public function getBin()
     {
-        return Arr::get($this->config, 'default', 'default');
+        if (null === $this->bin) {
+            $this->bin = $this->loadBin();
+        }
+
+        return $this->bin;
     }
 
     /**
-     * Get the configuration for a store.
-     *
-     * @param string $name
-     *
-     * @return array
-     * @throws \InvalidArgumentException
-     *
+     * @return string
      */
-    protected function configuration($name = null)
+    public function loadBin()
     {
-        $name = $name ?: $this->getDefaultClient();
-        $stores = Arr::get($this->config, 'stores', []);
-        $defaults = Arr::get($this->config, 'defaults', []);
+        $bit = 4 == PHP_INT_SIZE ? 32 : 64;
 
-        if (is_null($store = Arr::get($stores, $name))) {
-            throw new \InvalidArgumentException("captcha store [{$name}] not configured.");
+        if (!$this->isX86()) {
+            return dirname(__DIR__) . "/bin/ossutilarm{$bit}.exe";
+        } elseif ('WIN' === strtoupper(substr(PHP_OS, 0, 3))) {
+            return dirname(__DIR__) . "/bin/ossutil{$bit}.exe";
+        } elseif ("Darwin" === PHP_OS) {
+            return dirname(__DIR__) . "/bin/ossutilmac{$bit}";
         }
 
-        return array_merge($store, $defaults);
+        return dirname(__DIR__) . "/bin/ossutil{$bit}";
+    }
+
+    /**
+     * @return bool
+     */
+    public function isX86()
+    {
+        ob_start();
+        phpinfo();
+
+        foreach ((array)explode(PHP_EOL, ob_get_clean()) as $line) {
+            if (Str::startsWith($line, 'System =>')
+                && Str::contains(strtolower($line), 'release_x86')
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

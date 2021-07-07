@@ -6,11 +6,9 @@
  * Time: 10:32 下午.
  */
 
-namespace HughCube\Laravel\Package;
+namespace HughCube\Laravel\OssUtil;
 
-use Illuminate\Foundation\Application as LaravelApplication;
 use Illuminate\Support\ServiceProvider as IlluminateServiceProvider;
-use Laravel\Lumen\Application as LumenApplication;
 
 class ServiceProvider extends IlluminateServiceProvider
 {
@@ -19,13 +17,6 @@ class ServiceProvider extends IlluminateServiceProvider
      */
     public function boot()
     {
-        $source = realpath(dirname(__DIR__) . '/config/config.php');
-
-        if ($this->app instanceof LaravelApplication && $this->app->runningInConsole()) {
-            $this->publishes([$source => config_path('package.php')]);
-        } elseif ($this->app instanceof LumenApplication) {
-            $this->app->configure('package');
-        }
     }
 
     /**
@@ -33,13 +24,8 @@ class ServiceProvider extends IlluminateServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(
-            'package',
-            function ($app) {
-                $config = $app->make('config')->get('package', []);
-
-                return new Manager($config);
-            }
-        );
+        $this->app->singleton('OssUtil', function ($app) {
+            return new Manager();
+        });
     }
 }

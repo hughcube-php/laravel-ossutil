@@ -6,19 +6,21 @@
  * Time: 10:31 下午.
  */
 
-namespace HughCube\Laravel\Package;
+namespace HughCube\Laravel\OssUtil;
 
 use Illuminate\Support\Facades\Facade as IlluminateFacade;
 
 /**
  * Class Package.
  *
- * @method static Store store(string $name = null)
+ * @method static string getBin()
+ * @method static string loadBin()
+ * @method static string isX86()
  *
- * @see \HughCube\Laravel\Package\Manager
- * @see \HughCube\Laravel\Package\ServiceProvider
+ * @see \HughCube\Laravel\OssUtil\Manager
+ * @see \HughCube\Laravel\OssUtil\ServiceProvider
  */
-class Facade extends IlluminateFacade
+class OssUtil extends IlluminateFacade
 {
     /**
      * Get the registered name of the component.
@@ -27,6 +29,6 @@ class Facade extends IlluminateFacade
      */
     protected static function getFacadeAccessor()
     {
-        return 'package';
+        return 'OssUtil';
     }
 }
