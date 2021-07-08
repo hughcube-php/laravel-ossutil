@@ -48,7 +48,7 @@ class Manager
         $bit = 4 == PHP_INT_SIZE ? 32 : 64;
 
         if (!$this->isX86()) {
-            return dirname(__DIR__) . "/bin/ossutilarm{$bit}.exe";
+            return dirname(__DIR__) . "/bin/ossutilarm{$bit}";
         } elseif ('WIN' === strtoupper(substr(PHP_OS, 0, 3))) {
             return dirname(__DIR__) . "/bin/ossutil{$bit}.exe";
         } elseif ("Darwin" === PHP_OS) {
@@ -67,9 +67,8 @@ class Manager
         phpinfo();
 
         foreach ((array)explode(PHP_EOL, ob_get_clean()) as $line) {
-            if (Str::startsWith($line, 'System =>')
-                && Str::contains(strtolower($line), 'release_x86')
-            ) {
+            if (Str::contains(strtolower($line), 'system')
+                && Str::contains(strtolower($line), 'release_x86')) {
                 return true;
             }
         }
