@@ -65,14 +65,8 @@ class Manager
     {
         ob_start();
         phpinfo();
+        $phpinfo = ob_get_clean();
 
-        foreach ((array)explode(PHP_EOL, ob_get_clean()) as $line) {
-            if (Str::contains(strtolower($line), 'system')
-                && Str::contains(strtolower($line), 'release_x86')) {
-                return true;
-            }
-        }
-
-        return false;
+        return Str::contains($phpinfo, 'x86') || Str::contains($phpinfo, 'X86');
     }
 }
